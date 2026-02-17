@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import './App.css'
 import TreeMap from './TreeMap.jsx'
+import YearFilter from './YearFilter.jsx'
 
 function App() {
   const dataUrl = useMemo(
@@ -138,6 +139,22 @@ function App() {
     return count
   }, [loadState.status, loadState.yearCounts, startYear, endYear])
 
+  function handleStartYearChange(year) {
+    setStartYear(year)
+    setFocusFeatureId(null)
+    if (year && endYear && parseInt(year, 10) > parseInt(endYear, 10)) {
+      setEndYear(year)
+    }
+  }
+
+  function handleEndYearChange(year) {
+    setEndYear(year)
+    setFocusFeatureId(null)
+    if (year && startYear && parseInt(year, 10) < parseInt(startYear, 10)) {
+      setStartYear(year)
+    }
+  }
+
   return (
     <>
       <main className="main main--split">
@@ -158,65 +175,14 @@ function App() {
           )}
           {loadState.status === 'loaded' && (
             <div className="grid">
-              <div className="span2">
-                <div className="label">Year range</div>
-                <div className="value" style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', flexWrap: 'wrap' }}>
-                  <select
-                    value={startYear ?? ''}
-                    onChange={(e) => {
-                      const year = e.target.value || null
-                      setStartYear(year)
-                      setFocusFeatureId(null)
-                      // Ensure endYear is not before startYear
-                      if (year && endYear && parseInt(year, 10) > parseInt(endYear, 10)) {
-                        setEndYear(year)
-                      }
-                    }}
-                    style={{ padding: '0.4rem 0.6rem', borderRadius: '6px', border: '1px solid rgba(255, 255, 255, 0.16)', background: 'rgba(0, 0, 0, 0.22)', color: 'inherit', minWidth: '100px' }}
-                  >
-                    <option value="">Start year</option>
-                    {loadState.years.map((year) => (
-                      <option key={year} value={year}>
-                        {year}
-                      </option>
-                    ))}
-                  </select>
-                  <span>to</span>
-                  <select
-                    value={endYear ?? ''}
-                    onChange={(e) => {
-                      const year = e.target.value || null
-                      setEndYear(year)
-                      setFocusFeatureId(null)
-                      // Ensure startYear is not after endYear
-                      if (year && startYear && parseInt(year, 10) < parseInt(startYear, 10)) {
-                        setStartYear(year)
-                      }
-                    }}
-                    style={{ padding: '0.4rem 0.6rem', borderRadius: '6px', border: '1px solid rgba(255, 255, 255, 0.16)', background: 'rgba(0, 0, 0, 0.22)', color: 'inherit', minWidth: '100px' }}
-                  >
-                    <option value="">End year</option>
-                    {loadState.years.map((year) => (
-                      <option key={year} value={year}>
-                        {year}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                {startYear && endYear && typeof yearRangeCount === 'number' ? (
-                  <div className="hint" style={{ marginTop: '0.35rem' }}>
-                    <span className="mono">{yearRangeCount}</span> records in range
-                  </div>
-                ) : startYear || endYear ? (
-                  <div className="hint" style={{ marginTop: '0.35rem' }}>
-                    Select both start and end year to filter
-                  </div>
-                ) : (
-                  <div className="hint" style={{ marginTop: '0.35rem' }}>
-                    Select a year range to filter, or leave empty to show all years
-                  </div>
-                )}
-              </div>
+              <YearFilter
+                years={loadState.years}
+                startYear={startYear}
+                endYear={endYear}
+                yearRangeCount={yearRangeCount}
+                onStartYearChange={handleStartYearChange}
+                onEndYearChange={handleEndYearChange}
+              />
             </div>
           )}
         </section>
