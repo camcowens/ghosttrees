@@ -1,0 +1,114 @@
+#root {
+  width: 100%;
+  height: 100vh;
+  margin: 0;
+  padding: 0;
+}
+
+.main {
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0;
+  height: 100vh;
+}
+
+.main.main--split {
+  grid-template-columns: minmax(260px, 360px) 1fr;
+  align-items: stretch;
+}
+
+.panel--left {
+  align-self: stretch;
+  height: 100%;
+  overflow-y: auto;
+}
+
+.panel--right {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: transparent;
+  padding: 0;
+}
+
+.panel--right h2 {
+  display: none;
+}
+
+.mapRoot {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  flex: 1;
+  overflow: hidden;
+}
+
+.mapRoot .leaflet-container {
+  width: 100%;
+  height: 100%;
+}
+
+.panel {
+  border: none;
+  border-radius: 0;
+  padding: 1rem 1rem 0.75rem;
+  background: var(--color-bg-panel);
+}
+
+.panel.panel--right {
+  background: transparent;
+  padding: 0;
+}
+
+.panel h2 {
+  margin: 0 0 0.75rem;
+  font-size: 1.1rem;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem 1rem;
+}
+
+.span2 {
+  grid-column: 1 / -1;
+}
+
+.label {
+  font-size: 0.82rem;
+  color: var(--color-text-muted);
+  margin-bottom: 0.25rem;
+}
+
+.value {
+  margin: 0;
+}
+
+.mono {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+    'Liberation Mono', 'Courier New', monospace;
+  font-size: 0.95em;
+  overflow-wrap: anywhere;
+}
+
+.error {
+  color: var(--color-error);
+}
+
+.hint {
+  margin-top: 0.35rem;
+  font-size: 0.85rem;
+  color: var(--color-text-hint);
+}
+
+@media (max-width: 768px) {
+  .main.main--split {
+    grid-template-columns: 1fr;
+  }
+
+  .panel--right {
+    margin-top: 0.5rem;
+  }
+}
