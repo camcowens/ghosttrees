@@ -95,7 +95,7 @@ function HomeButton() {
   return null
 }
 
-function ClusterLayer({ points, startYear, endYear, focusFeatureId }) {
+function ClusterLayer({ points, startYear, endYear, focusFeatureId, onFeatureClick }) {
   const map = useMap()
   const clusterGroupRef = useRef(null)
   const markerByIdRef = useRef(new Map())
@@ -143,12 +143,15 @@ function ClusterLayer({ points, startYear, endYear, focusFeatureId }) {
       marker.bindPopup(popupHtml(p.props) || '<div>(no details)</div>', {
         maxWidth: 320,
       })
+      marker.on('click', () => {
+        onFeatureClick?.(p.id)
+      })
       nextMarkerById.set(p.id, marker)
       clusterGroup.addLayer(marker)
     }
 
     markerByIdRef.current = nextMarkerById
-  }, [filteredPoints])
+  }, [filteredPoints, onFeatureClick])
 
   useEffect(() => {
     if (!focusFeatureId) return
@@ -187,6 +190,7 @@ function TreeMap({
   startYear = null,
   endYear = null,
   focusFeatureId = null,
+  onFeatureClick = null,
   cityLimits = null,
 }) {
   const center = [33.749, -84.39]
@@ -246,6 +250,7 @@ function TreeMap({
         startYear={startYear}
         endYear={endYear}
         focusFeatureId={focusFeatureId}
+        onFeatureClick={onFeatureClick}
       />
     </MapContainer>
   )

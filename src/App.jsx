@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import './App.css'
+import FeatureDetails from './FeatureDetails.jsx'
 import TreeMap from './TreeMap.jsx'
 import YearFilter from './YearFilter.jsx'
 
@@ -139,6 +140,15 @@ function App() {
     return count
   }, [loadState.status, loadState.yearCounts, startYear, endYear])
 
+  const selectedFeature = useMemo(() => {
+    if (loadState.status !== 'loaded' || !focusFeatureId) return null
+    return (
+      loadState.features.find(
+        (f, idx) => (f.id ?? String(idx)) === focusFeatureId,
+      ) ?? null
+    )
+  }, [loadState.status, loadState.features, focusFeatureId])
+
   function handleStartYearChange(year) {
     setStartYear(year)
     setFocusFeatureId(null)
@@ -183,6 +193,10 @@ function App() {
                 onStartYearChange={handleStartYearChange}
                 onEndYearChange={handleEndYearChange}
               />
+              <FeatureDetails
+                feature={selectedFeature}
+                onClear={() => setFocusFeatureId(null)}
+              />
             </div>
           )}
         </section>
@@ -206,6 +220,7 @@ function App() {
               startYear={startYear}
               endYear={endYear}
               focusFeatureId={focusFeatureId}
+              onFeatureClick={setFocusFeatureId}
               cityLimits={cityLimits}
             />
           </div>
