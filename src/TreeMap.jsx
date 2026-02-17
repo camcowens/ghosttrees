@@ -42,8 +42,9 @@ function popupHtml(props) {
     parts.push(`<div>${escapeHtml(props.Address)}</div>`)
   }
   if (props?.Record_Type) {
+    const recordTypeDisplay = String(props.Record_Type).replace(/_/g, ' ')
     parts.push(
-      `<div><strong>Record type:</strong> ${escapeHtml(props.Record_Type)}</div>`,
+      `<div><strong>Record Type:</strong> ${escapeHtml(recordTypeDisplay)}</div>`,
     )
   }
   if (props?.Date) {
