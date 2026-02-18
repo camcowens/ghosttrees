@@ -3,6 +3,7 @@ import './App.css'
 import FeatureDetails from './FeatureDetails.jsx'
 import TreeMap from './TreeMap.jsx'
 import YearFilter from './YearFilter.jsx'
+import FilterStatus from './FilterStatus.jsx'
 
 function App() {
   const dataUrl = useMemo(
@@ -28,7 +29,6 @@ function App() {
     samplePropertyKeys: [],
     recordTypeCounts: [],
     years: [],
-    yearCounts: {},
     features: [],
   })
 
@@ -63,14 +63,13 @@ function App() {
           .sort((a, b) => b[1] - a[1])
           .slice(0, 12)
 
-        const yearCounts = new Map()
+        const yearSet = new Set()
         for (const f of features) {
           const y = f?.properties?.Year
           if (!y) continue
-          const ys = String(y)
-          yearCounts.set(ys, (yearCounts.get(ys) ?? 0) + 1)
+          yearSet.add(String(y))
         }
-        const years = [...yearCounts.keys()].sort()
+        const years = [...yearSet].sort()
 
         setLoadState({
           status: 'loaded',
@@ -80,7 +79,6 @@ function App() {
           samplePropertyKeys,
           recordTypeCounts,
           years,
-          yearCounts: Object.fromEntries(yearCounts.entries()),
           features,
         })
 
@@ -123,22 +121,42 @@ function App() {
     return () => controller.abort()
   }, [cityLimitsUrl])
 
-  const yearRangeCount = useMemo(() => {
-    if (loadState.status !== 'loaded' || !startYear || !endYear) return null
-    
-    let count = 0
-    const start = parseInt(startYear, 10)
-    const end = parseInt(endYear, 10)
-    
-    for (const [year, yearCount] of Object.entries(loadState.yearCounts)) {
-      const y = parseInt(year, 10)
-      if (y >= start && y <= end) {
-        count += yearCount
+  const filteredFeatures = useMemo(() => {
+    if (loadState.status !== 'loaded') return []
+
+    const start = startYear ? parseInt(startYear, 10) : null
+    const end = endYear ? parseInt(endYear, 10) : null
+
+    return loadState.features.filter((f) => {
+      const yearValue = f?.properties?.Year
+      const year = yearValue ? parseInt(yearValue, 10) : null
+
+      if (start != null && end != null) {
+        if (year == null) return false
+        return year >= start && year <= end
       }
-    }
-    
-    return count
-  }, [loadState.status, loadState.yearCounts, startYear, endYear])
+
+      // If only one side of the range is selected, treat it as inclusive bound.
+      if (start != null) {
+        if (year == null) return false
+        return year >= start
+      }
+      if (end != null) {
+        if (year == null) return false
+        return year <= end
+      }
+
+      // No year filter selected.
+      return true
+    })
+  }, [loadState.status, loadState.features, startYear, endYear])
+
+  const totalCount =
+    loadState.status === 'loaded' && typeof loadState.featureCount === 'number'
+      ? loadState.featureCount
+      : 0
+
+  const shownCount = filteredFeatures.length
 
   const selectedFeature = useMemo(() => {
     if (loadState.status !== 'loaded' || !focusFeatureId) return null
@@ -184,20 +202,22 @@ function App() {
             </p>
           )}
           {loadState.status === 'loaded' && (
-            <div className="grid">
-              <YearFilter
-                years={loadState.years}
-                startYear={startYear}
-                endYear={endYear}
-                yearRangeCount={yearRangeCount}
-                onStartYearChange={handleStartYearChange}
-                onEndYearChange={handleEndYearChange}
-              />
-              <FeatureDetails
-                feature={selectedFeature}
-                onClear={() => setFocusFeatureId(null)}
-              />
-            </div>
+            <>
+              <FilterStatus shownCount={shownCount} totalCount={totalCount} />
+              <div className="grid">
+                <YearFilter
+                  years={loadState.years}
+                  startYear={startYear}
+                  endYear={endYear}
+                  onStartYearChange={handleStartYearChange}
+                  onEndYearChange={handleEndYearChange}
+                />
+                <FeatureDetails
+                  feature={selectedFeature}
+                  onClear={() => setFocusFeatureId(null)}
+                />
+              </div>
+            </>
           )}
         </section>
 
@@ -215,10 +235,8 @@ function App() {
           <div className="mapRoot">
             <TreeMap
               features={
-                loadState.status === 'loaded' ? loadState.features : []
+                loadState.status === 'loaded' ? filteredFeatures : []
               }
-              startYear={startYear}
-              endYear={endYear}
               focusFeatureId={focusFeatureId}
               onFeatureClick={setFocusFeatureId}
               cityLimits={cityLimits}

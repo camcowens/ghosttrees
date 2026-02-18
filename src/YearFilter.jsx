@@ -11,7 +11,6 @@ export default function YearFilter({
   years,
   startYear,
   endYear,
-  yearRangeCount,
   onStartYearChange,
   onEndYearChange,
 }) {
@@ -53,19 +52,9 @@ export default function YearFilter({
           ))}
         </select>
       </div>
-      {startYear && endYear && typeof yearRangeCount === 'number' ? (
-        <div className="hint" style={{ marginTop: '0.35rem' }}>
-          <span className="mono">{yearRangeCount}</span> records in range
-        </div>
-      ) : startYear || endYear ? (
-        <div className="hint" style={{ marginTop: '0.35rem' }}>
-          Select both start and end year to filter
-        </div>
-      ) : (
-        <div className="hint" style={{ marginTop: '0.35rem' }}>
-          Select a year range to filter, or leave empty to show all years
-        </div>
-      )}
+      <div className="hint" style={{ marginTop: '0.35rem' }}>
+        Select a year range to filter, or leave empty to include all years
+      </div>
     </div>
   )
 }

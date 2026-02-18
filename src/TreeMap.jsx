@@ -95,23 +95,10 @@ function HomeButton() {
   return null
 }
 
-function ClusterLayer({ points, startYear, endYear, focusFeatureId, onFeatureClick }) {
+function ClusterLayer({ points, focusFeatureId, onFeatureClick }) {
   const map = useMap()
   const clusterGroupRef = useRef(null)
   const markerByIdRef = useRef(new Map())
-
-  const filteredPoints = useMemo(() => {
-    if (!startYear || !endYear) return points
-    
-    const start = parseInt(startYear, 10)
-    const end = parseInt(endYear, 10)
-    
-    return points.filter((p) => {
-      if (!p.year) return false
-      const year = parseInt(p.year, 10)
-      return year >= start && year <= end
-    })
-  }, [points, startYear, endYear])
 
   useEffect(() => {
     const clusterGroup = L.markerClusterGroup({
@@ -138,7 +125,7 @@ function ClusterLayer({ points, startYear, endYear, focusFeatureId, onFeatureCli
     clusterGroup.clearLayers()
     const nextMarkerById = new Map()
 
-    for (const p of filteredPoints) {
+    for (const p of points) {
       const marker = L.marker([p.lat, p.lon], { icon: defaultIcon })
       marker.bindPopup(popupHtml(p.props) || '<div>(no details)</div>', {
         maxWidth: 320,
@@ -151,7 +138,7 @@ function ClusterLayer({ points, startYear, endYear, focusFeatureId, onFeatureCli
     }
 
     markerByIdRef.current = nextMarkerById
-  }, [filteredPoints, onFeatureClick])
+  }, [points, onFeatureClick])
 
   useEffect(() => {
     if (!focusFeatureId) return
@@ -187,8 +174,6 @@ function CityLimitsLayer({ cityLimits }) {
 
 function TreeMap({
   features = [],
-  startYear = null,
-  endYear = null,
   focusFeatureId = null,
   onFeatureClick = null,
   cityLimits = null,
@@ -224,9 +209,8 @@ function TreeMap({
 
       const props = f.properties ?? {}
       const id = f.id ?? String(idx)
-      const year = props?.Year ? String(props.Year) : null
 
-      out.push({ id, lat, lon, year, props })
+      out.push({ id, lat, lon, props })
     }
 
     return out
@@ -247,8 +231,6 @@ function TreeMap({
       <CityLimitsLayer cityLimits={cityLimits} />
       <ClusterLayer
         points={points}
-        startYear={startYear}
-        endYear={endYear}
         focusFeatureId={focusFeatureId}
         onFeatureClick={onFeatureClick}
       />
