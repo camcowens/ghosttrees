@@ -214,8 +214,11 @@ function App() {
           )}
           {loadState.status === 'loaded' && (
             <>
-              <FilterStatus shownCount={shownCount} totalCount={totalCount} />
               <div className="grid">
+                <div className="span2">
+                  <FilterStatus shownCount={shownCount} totalCount={totalCount} />
+                </div>
+                <div className="panel-divider span2" />
                 <YearFilter
                   years={loadState.years}
                   startYear={startYear}
@@ -223,10 +226,12 @@ function App() {
                   onStartYearChange={handleStartYearChange}
                   onEndYearChange={handleEndYearChange}
                 />
+                <div className="panel-divider span2" />
                 <TreeCountFilter
                   minTrees={minTrees}
                   onMinTreesChange={handleMinTreesChange}
                 />
+                <div className="panel-divider span2" />
                 <FeatureDetails
                   feature={selectedFeature}
                   onClear={() => setFocusFeatureId(null)}
