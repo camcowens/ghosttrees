@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.1] - 2026-02-18
+
+### Changed
+- Record count is now always shown above the filters as "Showing X of Y records."
+- Year range control simplified; inline count and extra hints removed.
+
 ## [0.2.0] - 2026-02-17
 
 ### Added
@@ -20,7 +26,3 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - GeoJSON data visualization for Atlanta tree canopy
 - Marker clustering for improved performance
 - Time-based filtering of deceased trees
-
-[Unreleased]: https://github.com/camcowens/ghosttrees/compare/v0.2.0...HEAD
-[0.2.0]: https://github.com/camcowens/ghosttrees/releases/tag/v0.2.0
-[0.1.0]: https://github.com/camcowens/ghosttrees/releases/tag/v0.1.0
