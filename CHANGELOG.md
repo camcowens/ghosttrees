@@ -7,11 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-02-18
+
+### Added
+- Filter to control minimum tree count of displayed records
+- Dividers between control panel components
+
 ## [0.2.1] - 2026-02-18
 
 ### Changed
 - Record count is now always shown above the filters as "Showing X of Y records."
-- Year range control simplified; inline count and extra hints removed.
+- Year range control simplified; inline count and extra hints removed
 
 ## [0.2.0] - 2026-02-17
 
