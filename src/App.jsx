@@ -3,6 +3,7 @@ import './App.css'
 import FeatureDetails from './FeatureDetails.jsx'
 import TreeMap from './TreeMap.jsx'
 import YearFilter from './YearFilter.jsx'
+import TreeCountFilter from './TreeCountFilter.jsx'
 import FilterStatus from './FilterStatus.jsx'
 
 function App() {
@@ -18,6 +19,7 @@ function App() {
 
   const [startYear, setStartYear] = useState(null)
   const [endYear, setEndYear] = useState(null)
+  const [minTrees, setMinTrees] = useState(null)
   const [focusFeatureId, setFocusFeatureId] = useState(null)
   const [cityLimits, setCityLimits] = useState(null)
 
@@ -85,6 +87,7 @@ function App() {
         // Default to all years (no filter).
         setStartYear(null)
         setEndYear(null)
+        setMinTrees(null)
       } catch (err) {
         if (controller.signal.aborted) return
         setLoadState((s) => ({
@@ -128,28 +131,31 @@ function App() {
     const end = endYear ? parseInt(endYear, 10) : null
 
     return loadState.features.filter((f) => {
+      // Year filter
       const yearValue = f?.properties?.Year
       const year = yearValue ? parseInt(yearValue, 10) : null
 
       if (start != null && end != null) {
         if (year == null) return false
-        return year >= start && year <= end
+        if (!(year >= start && year <= end)) return false
+      } else if (start != null) {
+        if (year == null) return false
+        if (!(year >= start)) return false
+      } else if (end != null) {
+        if (year == null) return false
+        if (!(year <= end)) return false
       }
 
-      // If only one side of the range is selected, treat it as inclusive bound.
-      if (start != null) {
-        if (year == null) return false
-        return year >= start
-      }
-      if (end != null) {
-        if (year == null) return false
-        return year <= end
+      // Tree count filter
+      if (minTrees != null) {
+        const raw = f?.properties?.Num_of_Trees
+        const num = raw != null ? parseInt(raw, 10) : null
+        if (num == null || num < minTrees) return false
       }
 
-      // No year filter selected.
       return true
     })
-  }, [loadState.status, loadState.features, startYear, endYear])
+  }, [loadState.status, loadState.features, startYear, endYear, minTrees])
 
   const totalCount =
     loadState.status === 'loaded' && typeof loadState.featureCount === 'number'
@@ -183,6 +189,11 @@ function App() {
     }
   }
 
+  function handleMinTreesChange(value) {
+    setMinTrees(value)
+    setFocusFeatureId(null)
+  }
+
   return (
     <>
       <main className="main main--split">
@@ -211,6 +222,10 @@ function App() {
                   endYear={endYear}
                   onStartYearChange={handleStartYearChange}
                   onEndYearChange={handleEndYearChange}
+                />
+                <TreeCountFilter
+                  minTrees={minTrees}
+                  onMinTreesChange={handleMinTreesChange}
                 />
                 <FeatureDetails
                   feature={selectedFeature}
