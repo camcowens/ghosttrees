@@ -167,11 +167,11 @@ function App() {
   const selectedFeature = useMemo(() => {
     if (loadState.status !== 'loaded' || !focusFeatureId) return null
     return (
-      loadState.features.find(
+      filteredFeatures.find(
         (f, idx) => (f.id ?? String(idx)) === focusFeatureId,
       ) ?? null
     )
-  }, [loadState.status, loadState.features, focusFeatureId])
+  }, [loadState.status, filteredFeatures, focusFeatureId])
 
   function handleStartYearChange(year) {
     setStartYear(year)
